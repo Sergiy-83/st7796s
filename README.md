@@ -1,19 +1,15 @@
 # st7796s
-DRM driver for st7796s (SPI interface)
+DRM драйвер для st7796s (подключение по SPI)
 
-
-# st7796s
-DRM driver for st7796s (SPI interface)
-
-
-install:  
+Установка:
+В системе должны быть установлен пакет h-файлов от текущего ядра.  
 git clone https://github.com/Sergiy-83/st7796s  
 cd st7796s  
 make  
 make install  
 
 
-Connection example in the device tree  
+Пример подключения в device tree  
 
 ``` 
 &spi1

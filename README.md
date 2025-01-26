@@ -29,14 +29,14 @@ Connection example in the device tree
 		reg 	   = <0>;
 		//backlight  = <&backlight_pwm7>;
 
-        spi-max-frequency = <64000000>;
+		spi-max-frequency = <64000000>;
 		
 		dc-gpios = <&pio 3 13 0>; //PD13
 		reset-gpios = <&pio 3 14 0>; //PD14
 		
-        bgr;
-        fps 	 = <25>;
-        buswidth = <8>;
+		bgr;
+		fps 	 = <25>;
+		buswidth = <8>;
 		rotation = <270>;
 		status 	 = "okay";
 		debug	 = <3>;

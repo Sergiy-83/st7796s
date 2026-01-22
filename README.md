@@ -23,7 +23,7 @@ make install
 		compatible = "sitronix,st7796s";
 		
 		reg 	   = <0>;
-		//backlight  = <&backlight_pwm7>;
+		//backlight  = <&backlight_pwm7>; //Ссылка на PWM. (compatible = "pwm-backlight")
 
 		spi-max-frequency = <64000000>;
 		
@@ -36,6 +36,7 @@ make install
 		rotation = <270>;
 		status 	 = "okay";
 		debug	 = <3>;
+		//color-inversion; //Некоторые панели требуют включения инверсии цветов
 		};
 	};
 ```

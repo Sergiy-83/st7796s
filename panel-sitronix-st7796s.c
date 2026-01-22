@@ -2,7 +2,7 @@
  * DRM driver for display panels connected to a Sitronix ST7796S (SKU:MSP4031)
  * display controller in SPI mode.
  *
- * Copyright 2025 Sergey Horoshevskiy <horoshevskiy_83@mail.ru>
+ * Copyright 2025 Sergiy_83 <shaudioprojects@gmail.com>
  */
 
 #include <linux/backlight.h>
@@ -31,8 +31,12 @@ static void st7796S_pipe_enable(struct drm_simple_display_pipe *pipe, struct drm
 	{
 	struct mipi_dbi_dev *dbidev = drm_to_mipi_dbi_dev(pipe->crtc.dev);
 	struct mipi_dbi 	*dbi = &dbidev->dbi;
+	struct drm_device 	*drm = &dbidev->drm;
+	struct device 		*dev = drm->dev;
+
 	int ret, idx;
 	u8 addr_mode;
+	bool color_inversion = false;
 		
 	printk("st7796S - enable start");
 	
@@ -41,7 +45,10 @@ static void st7796S_pipe_enable(struct drm_simple_display_pipe *pipe, struct drm
 		printk("st7796S - enable return (!drm_dev_enter)");
 		return;
 		}
-
+	//Получаем параметр инверсии цветов из свойств устройства
+	//device_property_read_bool(dbi->dev, "color-inversion", &color_inversion);
+	color_inversion = device_property_read_bool(dev, "color-inversion");
+	
 	ret = mipi_dbi_poweron_conditional_reset(dbidev);
 	if (ret < 0)
 		goto out_exit;
@@ -68,7 +75,12 @@ static void st7796S_pipe_enable(struct drm_simple_display_pipe *pipe, struct drm
 
 	mipi_dbi_command(dbi,0xF0,0xC3); //Command Set control. Enable extension command 2 partI                                 
 	mipi_dbi_command(dbi,0xF0,0x96); //Command Set control. Enable extension command 2 partII
-	  
+	
+	/* Применяем настройку инверсии цветов в зависимости от параметра */
+	if (color_inversion)
+		mipi_dbi_command(dbi,0x21); // Display Inversion ON
+	else
+		mipi_dbi_command(dbi,0x20); // Display Inversion OFF
 	mipi_dbi_command(dbi,0x36,0x48); //Memory Data Access Control MX, MY, RGB mode   X-Mirror, Top-Left to right-Buttom, RGB                                   
 	mipi_dbi_command(dbi,0x3A,0x55); //Interface Pixel Format. Control interface color format set to 16 (RGB565)
 	mipi_dbi_command(dbi,0xB4,0x01); //Column inversion.  1-dot inversion
@@ -97,6 +109,7 @@ static void st7796S_pipe_enable(struct drm_simple_display_pipe *pipe, struct drm
 	mipi_dbi_command(dbi,0xF0,0x3C); 
 	mipi_dbi_command(dbi,0xF0,0x69);
   
+
 out_enable:
 	switch (dbidev->rotation) 
 		{
@@ -146,7 +159,7 @@ static const struct drm_driver st7796S_driver =
 	.debugfs_init	= mipi_dbi_debugfs_init,
 	.name			= "st7796S",
 	.desc			= "Sitronix ST7796S",
-	.date			= "20250126",
+	.date			= "20260122",
 	.major			= 1,
 	.minor			= 0,
 	};
@@ -247,5 +260,5 @@ static struct spi_driver st7796S_spi_driver =
 module_spi_driver(st7796S_spi_driver);
 
 MODULE_DESCRIPTION("Sitronix ST7796S SPI DRM driver");
-MODULE_AUTHOR("Sergey Horoshevskiy <horoshevskiy_83@mail.ru>");
+MODULE_AUTHOR("Sergiy_83 <shaudioprojects@gmail.com>");
 MODULE_LICENSE("GPL");
